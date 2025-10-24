@@ -1,0 +1,31 @@
+---
+- name: Устанавливаем Nginx на Ubuntu
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+  become: yes
+
+- name: Устанавливаем Nginx на CentOS
+  shell: |
+    yum install -y epel-release
+    yum install -y nginx
+  when: ansible_os_family == "RedHat"
+  become: yes
+
+- name: Запускаем Nginx вручную (в контейнере)
+  shell: |
+    nginx || nginx -g 'daemon off;' &
+  args:
+    executable: /bin/bash
+  become: yes
+
+- name: Проверяем, что nginx запущен
+  shell: pgrep nginx
+  register: nginx_status
+  ignore_errors: yes
+
+- debug:
+    msg: "Nginx успешно запущен!"
+  when: nginx_status.rc == 0

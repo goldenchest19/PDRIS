@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  ansible-control:
+    build: 
+      context: .
+      dockerfile: ./dockerfileUbuntuHost
+    container_name: ansible-control
+    ports:
+      - "4444:22"
+    volumes:
+      - ./ansible:/home/admin/ansible
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /home/admin/ansible
+    tty: true
+    stdin_open: true
+    
+  centoshost: 
+    build: 
+      context: .
+      dockerfile: ./dockerfileCentOS
+    container_name: centos-ssh-host
+    ports:
+      - "2222:22"
+    
+  ubuntuhost:
+    build: 
+      context: .
+      dockerfile: ./dockerfileUbuntu
+    container_name: ubuntu-ssh-host
+    ports:
+      - "3333:22"
