@@ -21,13 +21,11 @@
   become: yes
 
 - name: Проверяем доступность Docker
-  delegate_to: localhost
   shell: docker info
   register: docker_check
   ignore_errors: yes
 
 - name: Запускаем приложение через shell-скрипт
-  delegate_to: localhost
   shell: bash /home/admin/app/run_app.sh
   when: docker_check.rc == 0
   become: yes

@@ -4,17 +4,9 @@
     name: nginx
     state: present
     update_cache: yes
-  when: ansible_os_family == "Debian"
   become: yes
 
-- name: Устанавливаем Nginx на CentOS
-  shell: |
-    yum install -y epel-release
-    yum install -y nginx
-  when: ansible_os_family == "RedHat"
-  become: yes
-
-- name: Запускаем Nginx вручную (в контейнере)
+- name: Запускаем Nginx вручную
   shell: |
     nginx || nginx -g 'daemon off;' &
   args:
