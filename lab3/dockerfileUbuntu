@@ -1,0 +1,52 @@
+FROM ubuntu:20.04
+
+# Установка зависимостей
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release \
+    software-properties-common \
+    openssh-server \
+    sudo
+
+# Добавление GPG-ключа Docker (новый метод)
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# Добавление официального репозитория Docker
+RUN echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Установка Docker CLI и Docker Compose
+RUN apt-get update && apt-get install -y docker-ce-cli docker-compose-plugin
+
+
+RUN mkdir /var/run/sshd
+
+
+# Создание пользователя вместо root
+# RUN useradd -m -s /bin/bash admin
+# RUN echo 'admin:securepassword' | chpasswd
+
+RUN groupadd -f docker && \
+    useradd -m -s /bin/bash admin && \
+    echo 'admin:securepassword' | chpasswd && \
+    usermod -aG sudo,docker admin && \
+    echo "admin ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Отключение root-логина
+#RUN sed -i 's/#PermitRootLogin prohibit-ssh/PermitRootLogin no/' /etc/ssh/sshd_config
+#RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+# Настройка ключей SSH
+RUN mkdir /home/admin/.ssh
+#COPY authorized_keys /home/admin/.ssh/
+RUN chown -R admin:admin /home/admin/.ssh
+RUN chmod 700 /home/admin/.ssh
+#RUN chmod 600 /home/admin/.ssh/authorized_keys
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

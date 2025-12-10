@@ -1,0 +1,12 @@
+---
+- name: Настройка веб-сервера
+  hosts: ubuntu-host-nginx
+  become: yes
+  roles:
+    - nginx
+
+- name: Деплой приложения
+  hosts: ubuntu-host-app
+  become: yes
+  roles:
+    - app

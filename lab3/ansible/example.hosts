@@ -1,0 +1,9 @@
+[group_server1]
+	ubuntu-host-nginx ansible_host=ubuntu-ssh-host-nginx ansible_ssh_user=admin ansible_ssh_pass=securepassword
+
+[group_server2]
+	ubuntu-host-app ansible_host=ubuntu-ssh-host-app ansible_ssh_user=admin ansible_ssh_pass=securepassword
+	
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'

@@ -1,0 +1,31 @@
+---
+- name: Создаём каталог для приложения
+  file:
+    path: /home/admin/app
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Копируем docker-compose.yml
+  copy:
+    src: docker-compose.yml
+    dest: /home/admin/app/docker-compose.yml
+    mode: '0644'
+  become: yes
+
+- name: Копируем shell-скрипт запуска
+  copy:
+    src: run_app.sh
+    dest: /home/admin/app/run_app.sh
+    mode: '0755'
+  become: yes
+
+- name: Проверяем доступность Docker
+  shell: docker info
+  register: docker_check
+  ignore_errors: yes
+
+- name: Запускаем приложение через shell-скрипт
+  shell: bash /home/admin/app/run_app.sh
+  when: docker_check.rc == 0
+  become: yes

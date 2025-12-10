@@ -1,0 +1,31 @@
+FROM ubuntu:20.04
+
+# Установка переменных окружения для избежания интерактивных запросов
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
+
+#Установка нужных служб
+RUN apt-get update && apt-get install -y openssh-server sudo python3 python3-pip sshpass 
+RUN mkdir /var/run/sshd
+
+# Установка Ansible
+RUN apt-get install -y ansible
+
+
+# Создание пользователя вместо root
+RUN useradd -m -s /bin/bash admin
+RUN echo 'admin:securepassword' | chpasswd
+
+# Отключение root-логина
+#RUN sed -i 's/#PermitRootLogin prohibit-ssh/PermitRootLogin no/' /etc/ssh/sshd_config
+#RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+# Настройка ключей SSH
+RUN mkdir /home/admin/.ssh
+#COPY authorized_keys /home/admin/.ssh/
+RUN chown -R admin:admin /home/admin/.ssh
+RUN chmod 700 /home/admin/.ssh
+#RUN chmod 600 /home/admin/.ssh/authorized_keys
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

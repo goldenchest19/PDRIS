@@ -1,0 +1,23 @@
+---
+- name: Устанавливаем Nginx на Ubuntu
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Запускаем Nginx вручную
+  shell: |
+    nginx || nginx -g 'daemon off;' &
+  args:
+    executable: /bin/bash
+  become: yes
+
+- name: Проверяем, что nginx запущен
+  shell: pgrep nginx
+  register: nginx_status
+  ignore_errors: yes
+
+- debug:
+    msg: "Nginx успешно запущен!"
+  when: nginx_status.rc == 0
