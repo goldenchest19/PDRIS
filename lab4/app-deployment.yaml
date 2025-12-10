@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: app
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.37.0 (HEAD)
+      labels:
+        io.kompose.service: app
+    spec:
+      containers:
+        - env:
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://db:5432/mydb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+          image: kirillignatev21/spring-app:1.0.0
+          name: spring-app
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always
